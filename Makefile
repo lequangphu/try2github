@@ -30,7 +30,7 @@ install:
 
 uninstall:
 	@rm -rf $(INSTALL_DIR)
-	@rm -f $(BIN_DIR)/try $(BIN_DIR)/promote $(BIN_DIR)/repo $(BIN_DIR)/tries
+	@rm -f $(BIN_DIR)/try $(BIN_DIR)/promote $(BIN_DIR)/repo
 	@echo "Uninstalled try2github"
 
 test:

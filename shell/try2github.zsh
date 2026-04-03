@@ -38,25 +38,8 @@ repo() {
 }
 
 # ============================================
-# tries - List and navigate experiments
-# ============================================
-tries() {
-    if [ $# -eq 0 ]; then
-        try2github_tries ls
-    else
-        TRY2GITHUB_AUTO_CD=1 try2github_tries "$@"
-    fi
-}
-
-# ============================================
 # Completion functions
 # ============================================
-
-_try_complete() {
-    local -a tries
-    tries=(${(f)"$(try2github_tries ls 2>/dev/null)"})
-    _describe -t tries 'tries' tries
-}
 
 _repo_complete() {
     local -a repos
@@ -66,7 +49,8 @@ _repo_complete() {
 
 _promote_complete() {
     local -a tries
-    tries=(${(f)"$(try2github_tries ls 2>/dev/null)"})
+    local tries_dir="$TRY2GITHUB_TRIES_DIR"
+    tries=(${(f)"$(ls -1 "$tries_dir" 2>/dev/null)"})
     _describe -t tries 'tries' tries
 }
 

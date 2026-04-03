@@ -73,16 +73,6 @@ repo path               # Print repos directory path
 repo my-project         # Shorthand: cd to matching repo
 ```
 
-### `tries [ls|cd|path] [name]`
-
-Navigate your experiments.
-
-```bash
-tries                   # List all tries
-tries cd my-idea        # Change to matching try
-tries path              # Print tries directory path
-```
-
 ## Installation
 
 ### One-liner (Recommended)

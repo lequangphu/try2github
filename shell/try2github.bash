@@ -37,16 +37,7 @@ repo() {
     fi
 }
 
-# ============================================
-# tries - List and navigate experiments
-# ============================================
-tries() {
-    if [ $# -eq 0 ]; then
-        try2github_tries ls
-    else
-        TRY2GITHUB_AUTO_CD=1 try2github_tries "$@"
-    fi
-}
+
 
 # ============================================
 # Completion for Bash (basic)
@@ -62,7 +53,7 @@ fi
 # Basic completion functions
 _try_complete_bash() {
     local cur="${COMP_WORDS[COMP_CWORD]}"
-    local tries=$(try2github_tries ls 2>/dev/null | tr '\n' ' ')
+    local tries=$(ls -1 "$TRY2GITHUB_TRIES_DIR" 2>/dev/null | tr '\n' ' ')
     COMPREPLY=($(compgen -W "$tries" -- "$cur"))
 }
 

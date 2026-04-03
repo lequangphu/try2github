@@ -100,17 +100,7 @@ fi
 EOF
     chmod +x "$BIN_DIR/repo"
     
-    cat > "$BIN_DIR/tries" << 'EOF'
-#!/bin/bash
-export TRY2GITHUB_ROOT="${HOME}/.local/share/try2github"
-source "$TRY2GITHUB_ROOT/lib/try2github.sh"
-if [ $# -eq 0 ]; then
-    try2github_tries ls
-else
-    TRY2GITHUB_AUTO_CD=1 try2github_tries "$@"
-fi
-EOF
-    chmod +x "$BIN_DIR/tries"
+
     
     # Get RC file
     local rc_file=$(get_rc_file "$shell")
@@ -147,7 +137,6 @@ EOF
     echo "  try <name> [template]      - Create a new experiment"
     echo "  promote <try> <repo>       - Promote try to GitHub repo"
     echo "  repo [ls|cd|open] [name]   - List and navigate repos"
-    echo "  tries [ls|cd] [name]       - List and navigate tries"
     echo ""
     echo "Templates: default, python, node, data"
     echo ""

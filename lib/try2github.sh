@@ -272,42 +272,4 @@ try2github_repo() {
     esac
 }
 
-# ============================================
-# try2github_tries - List experiments
-# Usage: try2github_tries [ls|cd|path] [name]
-# ============================================
-try2github_tries() {
-    local cmd="${1:-ls}"
-    
-    case "$cmd" in
-        ls|list)
-            ls -1 "$TRY2GITHUB_TRIES_DIR" 2>/dev/null
-            ;;
-        cd)
-            if [ -z "$2" ]; then
-                cd "$TRY2GITHUB_TRIES_DIR" 2>/dev/null || return 1
-                return 0
-            fi
-            local target=$(_try2github_find_try "$2")
-            if [ -n "$target" ]; then
-                cd "$target" 2>/dev/null && echo "$(basename "$target")"
-            else
-                echo "No try matching '$2'" >&2
-                return 1
-            fi
-            ;;
-        path)
-            echo "$TRY2GITHUB_TRIES_DIR"
-            ;;
-        *)
-            local target=$(_try2github_find_try "$cmd")
-            if [ -n "$target" ]; then
-                cd "$target" 2>/dev/null && echo "$(basename "$target")"
-            else
-                echo "Unknown: $cmd" >&2
-                echo "Usage: try2github_tries [ls|cd|path] [name]" >&2
-                return 1
-            fi
-            ;;
-    esac
-}
+
