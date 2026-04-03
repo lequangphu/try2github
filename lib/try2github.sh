@@ -58,10 +58,8 @@ _try2github_copy_template() {
     fi
     
     if [ -n "$template_dir" ]; then
-        # Copy template files
-        for file in "$template_dir"/* "$template_dir"/.[^.]* 2>/dev/null; do
-            [ -e "$file" ] && cp -r "$file" "$project_path/"
-        done
+        # Copy template files (including hidden files)
+        cp -r "$template_dir"/. "$project_path/" 2>/dev/null || cp -r "$template_dir"/* "$project_path/" 2>/dev/null || true
         
         # Substitute variables in template files
         for file in "$project_path"/*; do
