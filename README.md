@@ -81,12 +81,22 @@ repo my-project         # Shorthand: cd to matching repo
 curl -fsSL https://raw.githubusercontent.com/lequangphu/try2github/main/install.sh | bash
 ```
 
+Then restart your shell or run:
+```bash
+source ~/.zshrc  # or ~/.bashrc for bash
+```
+
 ### Manual
 
 ```bash
 git clone https://github.com/lequangphu/try2github.git ~/.local/share/try2github
-source ~/.local/share/try2github/shell/try2github.zsh  # or .bash for bash
+
+# Add to your ~/.zshrc or ~/.bashrc:
+echo 'source ~/.local/share/try2github/shell/try2github.zsh' >> ~/.zshrc
+source ~/.zshrc
 ```
+
+**Important:** `repo cd` only works when you source the shell integration. Standalone scripts cannot change your shell's working directory.
 
 ### Requirements
 

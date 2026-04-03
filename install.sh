@@ -117,7 +117,7 @@ EOF
         fi
     fi
     
-    # Source shell integration for completions
+    # Source shell integration for functions and completions
     if [ -n "$rc_file" ] && [ -f "$rc_file" ]; then
         local source_line="source \"$INSTALL_DIR/shell/try2github.$shell\""
         if ! grep -q "$source_line" "$rc_file" 2>/dev/null; then
@@ -126,6 +126,12 @@ EOF
             echo "# try2github" >> "$rc_file"
             echo "$source_line" >> "$rc_file"
         fi
+    fi
+    
+    print_warning "To use try2github, you must source the shell integration."
+    print_warning "Standalone scripts (try, promote, repo) don't work for 'cd' commands."
+    if [ -n "$rc_file" ]; then
+        print_status "Run: source $rc_file"
     fi
     
     # Create config directory

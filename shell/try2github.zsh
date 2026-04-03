@@ -2,12 +2,15 @@
 # try2github - Zsh integration
 # Source this file in your ~/.zshrc
 
-# Get the directory where this script is located
-local TRY2GITHUB_SHELL_DIR="${0:A:h}"
-local TRY2GITHUB_ROOT="${TRY2GITHUB_SHELL_DIR:h}"
+# Detect install location
+if [[ -d "$HOME/.local/share/try2github" ]]; then
+    TRY2GITHUB_ROOT="$HOME/.local/share/try2github"
+elif [[ -d "${0:A:h:h}" ]]; then
+    TRY2GITHUB_ROOT="${0:A:h:h}"
+fi
 
-# Export root for core functions
 export TRY2GITHUB_ROOT
+export TRY2GITHUB_GITHUB_USER="${TRY2GITHUB_GITHUB_USER:-lequangphu}"
 
 # Source the core library
 source "$TRY2GITHUB_ROOT/lib/try2github.sh"
@@ -16,25 +19,75 @@ source "$TRY2GITHUB_ROOT/lib/try2github.sh"
 # try - Create a new experiment (zsh wrapper)
 # ============================================
 try() {
-    TRY2GITHUB_AUTO_CD=1 try2github_try "$@"
+    try2github_try "$@"
+    local result=$?
+    # Auto-cd if successful and only given a name
+    if [[ $result -eq 0 && $# -eq 1 && -d "$TRY2GITHUB_TRIES_DIR"/*"$1"* ]]; then
+        local target=$(find "$TRY2GITHUB_TRIES_DIR" -maxdepth 1 -type d -name "*$1*" | head -1)
+        [[ -n "$target" ]] && cd "$target"
+    fi
+    return $result
 }
 
 # ============================================
 # promote - Promote try to GitHub repo
 # ============================================
 promote() {
-    TRY2GITHUB_AUTO_CD=1 try2github_promote "$@"
+    try2github_promote "$@"
+    local result=$?
+    # Auto-cd if successful
+    if [[ $result -eq 0 && -d "$TRY2GITHUB_REPOS_DIR/$TRY2GITHUB_GITHUB_USER/$2" ]]; then
+        cd "$TRY2GITHUB_REPOS_DIR/$TRY2GITHUB_GITHUB_USER/$2"
+    fi
+    return $result
 }
 
 # ============================================
 # repo - Navigate GitHub repos
 # ============================================
 repo() {
-    if [ $# -eq 0 ]; then
-        try2github_repo ls
-    else
-        TRY2GITHUB_AUTO_CD=1 try2github_repo "$@"
-    fi
+    local cmd="${1:-ls}"
+    
+    case "$cmd" in
+        ls|list)
+            try2github_repo ls
+            ;;
+        cd)
+            if [[ -z "$2" ]]; then
+                cd "$TRY2GITHUB_REPOS_DIR/$TRY2GITHUB_GITHUB_USER"
+            else
+                local target=$(find "$TRY2GITHUB_REPOS_DIR/$TRY2GITHUB_GITHUB_USER" -maxdepth 1 -type d -name "*$2*" | head -1)
+                if [[ -n "$target" ]]; then
+                    cd "$target"
+                    echo "$(basename "$target")"
+                else
+                    echo "No repo matching '$2'" >&2
+                    return 1
+                fi
+            fi
+            ;;
+        open)
+            if [[ -z "$2" ]]; then
+                gh repo view --web 2>/dev/null || echo "Not a git repo" >&2
+            else
+                gh repo view "$TRY2GITHUB_GITHUB_USER/$2" --web 2>/dev/null || open "https://github.com/$TRY2GITHUB_GITHUB_USER/$2"
+            fi
+            ;;
+        path)
+            echo "$TRY2GITHUB_REPOS_DIR/$TRY2GITHUB_GITHUB_USER"
+            ;;
+        *)
+            # Shorthand: try to cd to repo matching the arg
+            local target=$(find "$TRY2GITHUB_REPOS_DIR/$TRY2GITHUB_GITHUB_USER" -maxdepth 1 -type d -name "*$cmd*" | head -1)
+            if [[ -n "$target" ]]; then
+                cd "$target"
+                echo "$(basename "$target")"
+            else
+                echo "Unknown: $cmd" >&2
+                return 1
+            fi
+            ;;
+    esac
 }
 
 # ============================================
@@ -55,8 +108,14 @@ _promote_complete() {
 }
 
 # Register completions
-compdef _try_complete try 2>/dev/null
 compdef _repo_complete repo 2>/dev/null
+compdef _promote_complete promote 2>/dev/null
+
+# ============================================
+# Aliases
+# ============================================
+alias tr='try'
+alias pr='promote'
 compdef _promote_complete promote 2>/dev/null
 
 # ============================================
