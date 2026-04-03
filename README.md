@@ -1,76 +1,65 @@
 # try2github
 
-Experiment locally, promote to GitHub when ready.
+**try2github** extends [tobi/try](https://github.com/tobi/try) with GitHub workflow features.
 
-A lightweight CLI workflow for managing experimental projects that may become production repositories.
+It adds commands to move your experiments (tries) to GitHub repositories, and manage your production repos.
 
-## Quick Start
+## Requirements
 
-```bash
-# Install
-curl -fsSL https://raw.githubusercontent.com/lequangphu/try2github/main/install.sh | bash
+- [tobi/try](https://github.com/tobi/try) — Install first:
+  ```bash
+  gem install try-cli
+  ```
 
-# Create an experiment
-try my-idea
-
-# Work on it, iterate...
-
-# Promote to GitHub when ready
-promote my-idea my-idea-repo
-```
-
-## Overview
+## What It Does
 
 ```
 ~/src/
-├── github.com/
-│   └── yourname/          # Production repos (created via promote)
-│       ├── project-a/
-│       └── project-b/
-└── tries/                 # Experiments (disposable, dated)
-    ├── 2026-04-03-my-idea/
-    └── 2026-04-05-another-test/
+├── tries/                      # Your experiments (managed by tobi/try)
+│   ├── 2026-04-03-redis-test/
+│   └── 2026-04-05-api-client/
+└── github.com/
+    ├── lequangphu/             # Your production repos
+    │   ├── trading_bot/
+    │   └── try2github/
+    └── NousResearch/           # External repos
+        └── hermes-agent/
 ```
 
 ## Commands
 
-### `try <name> [template]`
+### `try` — From tobi/try
 
-Create a new experiment in `~/src/tries/` with a date prefix.
-
-```bash
-try my-new-project              # Creates ~/src/tries/2026-04-03-my-new-project/
-try my-api --template node      # Uses node template
-try my-ml --template python     # Uses python template
-```
-
-**Templates:**
-- `default` - Minimal README only
-- `python` - Python project structure (src/, tests/, notebooks/)
-- `node` - Node.js project structure (src/, tests/, package.json)
-- `data` - Data science structure (notebooks/, queries/)
-
-### `promote <try-pattern> <repo-name>`
-
-Move an experiment to production and create a GitHub repository.
+Fuzzy search and navigate your experiments.
 
 ```bash
-promote my-idea my-project        # Promotes 2026-04-03-my-idea to github.com/yourname/my-project
+try                    # Interactive fuzzy finder
+try redis              # Search for redis-related tries
 ```
 
-Requirements:
-- [GitHub CLI](https://cli.github.com/) (`gh`) installed and authenticated
+Install tobi/try first: `gem install try-cli`
 
-### `repo [ls|cd|open|path] [name]`
+### `promote <try-name> <repo-name>`
+
+Move a try to your GitHub repos and create a GitHub repository.
+
+```bash
+promote redis-test my-redis-project
+# Moves ~/src/tries/2026-04-03-redis-test to ~/src/github.com/lequangphu/my-redis-project
+# Creates GitHub repo, pushes code
+```
+
+### `repo [ls|cd|open|path|fav] [name]`
 
 Navigate your GitHub repositories.
 
 ```bash
-repo                    # List all repos
-repo cd my-project      # Change to matching repo
-repo open               # Open current repo on GitHub
-repo path               # Print repos directory path
-repo my-project         # Shorthand: cd to matching repo
+repo                   # List all repos
+repo cd trading        # Change to matching repo
+repo open              # Open current repo on GitHub
+repo path              # Print repos directory path
+repo fav               # Fuzzy select (requires fzf)
+repo trading           # Shorthand: cd to matching repo
 ```
 
 ### `clone <github-url>`
@@ -86,122 +75,91 @@ clone https://github.com/NousResearch/hermes-agent-self-evolution.git
 # Clones to ~/src/github.com/NousResearch/hermes-agent-self-evolution
 ```
 
-Works with both HTTPS and SSH URLs:
-```bash
-clone https://github.com/user/repo.git
-clone git@github.com:user/repo.git
-```
-
 ## Installation
 
-### One-liner (Recommended)
+### 1. Install tobi/try (Required)
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/lequangphu/try2github/main/install.sh | bash
+gem install try-cli
 ```
 
-Then restart your shell or run:
+### 2. Install try2github
+
 ```bash
-source ~/.zshrc  # or ~/.bashrc for bash
+# Clone to your own repos
+git clone https://github.com/lequangphu/try2github.git ~/src/github.com/lequangphu/try2github
+
+# Install
+cd ~/src/github.com/lequangphu/try2github && make install
 ```
 
-### Manual
+### 3. Add to Shell
+
+Add to `~/.zshrc`:
 
 ```bash
-git clone https://github.com/lequangphu/try2github.git ~/.local/share/try2github
+# tobi/try - for managing experiments
+eval "$(try init ~/src/tries)"
 
-# Add to your ~/.zshrc or ~/.bashrc:
-echo 'source ~/.local/share/try2github/shell/try2github.zsh' >> ~/.zshrc
+# try2github - for GitHub workflow
+source ~/.local/share/try2github/shell/try2github.zsh
+```
+
+Then reload:
+```bash
 source ~/.zshrc
 ```
-
-**Important:** `repo cd` only works when you source the shell integration. Standalone scripts cannot change your shell's working directory.
-
-### Requirements
-
-- `git` (required)
-- `gh` (GitHub CLI) - for `promote` command to create GitHub repos
-
-## Configuration
-
-Set environment variables to customize paths:
-
-```bash
-# ~/.zshrc or ~/.bashrc
-export TRY2GITHUB_TRIES_DIR="$HOME/experiments"
-export TRY2GITHUB_REPOS_DIR="$HOME/projects/github.com"
-export TRY2GITHUB_GITHUB_USER="myusername"
-```
-
-Or create a config file at `~/.config/try2github/config.yaml` (future feature).
-
-## Custom Templates
-
-Add custom templates to `~/.config/try2github/templates/<name>/`:
-
-```
-~/.config/try2github/templates/
-├── my-python/
-│   ├── README.md
-│   ├── requirements.txt
-│   └── src/
-└── my-web/
-    ├── README.md
-    ├── package.json
-    └── src/
-```
-
-Template variables:
-- `{{PROJECT_NAME}}` - Project name
-- `{{DATE}}` - Current date (YYYY-MM-DD)
-- `{{AUTHOR}}` - Git user name
 
 ## Workflow Example
 
 ```bash
-# 1. Start experimenting
-try oracle-detection --template python
-cd oracle-detection
-# ... hack on it ...
+# 1. Create experiment using tobi/try's fuzzy finder
+try redis-pool
 
-# 2. Iterate in tries/
-try oracle-detection-v2 --template python
-cd oracle-detection-v2
-# ... better version ...
+# Work on it...
 
-# 3. Ready to publish
-promote oracle-detection-v2 oracle-manipulation-detector
-# Creates GitHub repo, pushes code, ready for CI/CD
+# 2. Promote to GitHub when ready
+promote redis-pool redis-connection-pool
 
-# 4. Navigate repos
-repo cd oracle
-# Work on production code
+# 3. Navigate production repos
+repo cd redis
+
+# 4. Clone someone else's repo
+clone https://github.com/NousResearch/hermes-agent-self-evolution.git
 ```
+
+## Configuration
+
+Set environment variables in `~/.zshrc`:
+
+```bash
+export TRY2GITHUB_GITHUB_USER="yourusername"  # Default: lequangphu
+export TRY2GITHUB_REPOS_DIR="$HOME/projects"   # Default: ~/src/github.com
+export TRY_PATH="$HOME/experiments"            # tobi/try path
+```
+
+## Differences from tobi/try
+
+| Feature | tobi/try | try2github |
+|---------|----------|------------|
+| `try` command | ✅ Fuzzy finder for tries | ❌ Not included (use tobi/try) |
+| `promote` | ❌ No | ✅ Move tries to GitHub |
+| `repo` | ❌ No | ✅ Navigate GitHub repos |
+| `clone` | ❌ No | ✅ Clone to proper location |
+
+**try2github does not replace tobi/try — it extends it.**
 
 ## Shell Support
 
 - **Zsh**: Full support with completions
 - **Bash**: Full support with basic completions
-- **Fish**: Not yet implemented (contributions welcome)
 
-## Why try2github?
+## Requirements
 
-- **Low friction** for starting experiments (no repo creation ceremony)
-- **Clean separation** between disposable tries and production repos
-- **Dated organization** makes it easy to find recent work
-- **Easy promotion** when an experiment proves valuable
-- **Mirrors Go's GOPATH** structure for consistency
+- Ruby (for tobi/try)
+- git
+- gh (GitHub CLI) — for `promote` to create GitHub repos
 
 ## License
 
 MIT
-
-## Contributing
-
-Contributions welcome! Priority areas:
-- Fish shell support
-- Homebrew formula
-- More templates
-- FZF integration for fuzzy finding
-
-See [Issues](https://github.com/lequangphu/try2github/issues) for ideas.
