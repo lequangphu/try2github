@@ -31,6 +31,27 @@ _try2github_find_repo() {
 }
 
 # ============================================
+# try2github_check_github_user - Check/prompt for GitHub username
+# ============================================
+_try2github_check_github_user() {
+    if [ -z "$TRY2GITHUB_GITHUB_USER" ]; then
+        # Check if we're in an interactive shell
+        if [ -t 0 ] && [ -t 1 ]; then
+            echo "GitHub username not configured."
+            printf "Enter your GitHub username: "
+            read -r TRY2GITHUB_GITHUB_USER
+            export TRY2GITHUB_GITHUB_USER
+            echo "Tip: Add 'export TRY2GITHUB_GITHUB_USER=\"$TRY2GITHUB_GITHUB_USER\"' to your shell RC to make this permanent."
+            echo ""
+        else
+            echo "Error: TRY2GITHUB_GITHUB_USER not set. Set it with: export TRY2GITHUB_GITHUB_USER=\"yourusername\"" >&2
+            return 1
+        fi
+    fi
+    return 0
+}
+
+# ============================================
 # try2github_promote - Promote try to GitHub repo
 # Usage: try2github_promote <try-pattern> <repo-name>
 # ============================================
@@ -42,6 +63,9 @@ try2github_promote() {
         echo "Usage: try2github_promote <try-pattern> <repo-name>" >&2
         return 1
     fi
+    
+    # Check GitHub username
+    _try2github_check_github_user || return 1
     
     # Find the try directory
     local try_path=$(_try2github_find_try "$try_pattern")

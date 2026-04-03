@@ -13,14 +13,29 @@ if ! command -v try &>/dev/null; then
 fi
 
 # ============================================
+# Helper: Detect GitHub username
+# ============================================
+_try2github_detect_github_user() {
+    # Try gh CLI first
+    if command -v gh &>/dev/null; then
+        gh api user -q .login 2>/dev/null && return 0
+    fi
+    # Fall back to git config
+    git config --global user.name 2>/dev/null && return 0
+    # Return empty
+    echo ""
+}
+
+# ============================================
 # Configuration
 # ============================================
 TRY2GITHUB_SHELL_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 TRY2GITHUB_ROOT="$(dirname "$TRY2GITHUB_SHELL_DIR")"
 
 export TRY2GITHUB_ROOT
-export TRY2GITHUB_GITHUB_USER="${TRY2GITHUB_GITHUB_USER:-lequangphu}"
-export TRY2GITHUB_TRIES_DIR="${TRY_PATH:-$HOME/src/tries}"
+# Auto-detect if not set by user
+export TRY2GITHUB_GITHUB_USER="${TRY2GITHUB_GITHUB_USER:-$(_try2github_detect_github_user)}"
+export TRY2GITHUB_TRIES_DIR="${TRY2GITHUB_TRIES_DIR:-${TRY_PATH:-$HOME/src/tries}}"
 export TRY2GITHUB_REPOS_DIR="${TRY2GITHUB_REPOS_DIR:-$HOME/src/github.com}"
 
 # Source the core library

@@ -19,7 +19,7 @@ It adds commands to move your experiments (tries) to GitHub repositories, and ma
 │   ├── 2026-04-03-redis-test/
 │   └── 2026-04-05-api-client/
 └── github.com/
-    ├── lequangphu/             # Your production repos
+    ├── yourusername/           # Your production repos
     │   ├── trading_bot/
     │   └── try2github/
     └── NousResearch/           # External repos
@@ -45,7 +45,7 @@ Move a try to your GitHub repos and create a GitHub repository.
 
 ```bash
 promote redis-test my-redis-project
-# Moves ~/src/tries/2026-04-03-redis-test to ~/src/github.com/lequangphu/my-redis-project
+# Moves ~/src/tries/2026-04-03-redis-test to ~/src/github.com/YOUR_USERNAME/my-redis-project
 # Creates GitHub repo, pushes code
 ```
 
@@ -86,12 +86,12 @@ gem install try-cli
 ### 2. Install try2github
 
 ```bash
-# Clone to your own repos
-git clone https://github.com/lequangphu/try2github.git ~/src/github.com/lequangphu/try2github
-
-# Install
-cd ~/src/github.com/lequangphu/try2github && make install
+# Clone (destination is up to you)
+git clone https://github.com/lequangphu/try2github.git
+cd try2github && make install
 ```
+
+The clone destination is your choice — `~/src/github.com/YOUR_USER/`, `~/projects/`, `~/tools/`, anywhere you prefer. The `make install` command copies files to `~/.local/share/try2github/`.
 
 ### 3. Add to Shell
 
@@ -123,8 +123,9 @@ If you are an AI agent helping a user set up try2github, follow these steps:
 
 ### Installation Steps
 ```bash
-# 1. Install try2github (this will auto-install tobi/try if missing)
-cd ~/src/github.com/lequangphu/try2github && make install
+# 1. Clone and install (user chooses destination)
+git clone https://github.com/lequangphu/try2github.git
+cd try2github && make install  # This auto-installs tobi/try if missing
 
 # 2. Add to user's shell config (~/.zshrc or ~/.bashrc)
 echo 'eval "$(try init ~/src/tries)"' >> ~/.zshrc
@@ -174,7 +175,7 @@ clone https://github.com/NousResearch/hermes-agent-self-evolution.git
 Set environment variables in `~/.zshrc`:
 
 ```bash
-export TRY2GITHUB_GITHUB_USER="yourusername"  # Default: lequangphu
+export TRY2GITHUB_GITHUB_USER="yourusername"  # Auto-detected from gh CLI or git config
 export TRY2GITHUB_REPOS_DIR="$HOME/projects"   # Default: ~/src/github.com
 export TRY_PATH="$HOME/experiments"            # tobi/try path
 ```
