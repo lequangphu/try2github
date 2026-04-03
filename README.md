@@ -110,6 +110,47 @@ Then reload:
 source ~/.zshrc
 ```
 
+---
+
+## For AI Agents (Claude, Copilot, etc.)
+
+If you are an AI agent helping a user set up try2github, follow these steps:
+
+### Prerequisites Check
+1. Check if Ruby is installed: `command -v ruby`
+2. Check if gem is available: `command -v gem`
+3. If not, install Ruby: `brew install ruby` (macOS) or `apt-get install ruby` (Linux)
+
+### Installation Steps
+```bash
+# 1. Install try2github (this will auto-install tobi/try if missing)
+cd ~/src/github.com/lequangphu/try2github && make install
+
+# 2. Add to user's shell config (~/.zshrc or ~/.bashrc)
+echo 'eval "$(try init ~/src/tries)"' >> ~/.zshrc
+echo 'source ~/.local/share/try2github/shell/try2github.zsh' >> ~/.zshrc
+
+# 3. Reload shell config
+source ~/.zshrc
+```
+
+### Verify Installation
+```bash
+which try      # Should show tobi/try
+which promote  # Should be a function
+type repo      # Should be a function
+type clone     # Should be a function
+```
+
+### Common Tasks
+- **Create experiment**: `try <name>` (uses tobi/try's fuzzy finder)
+- **Promote to GitHub**: `promote <try-name> <repo-name>`
+- **List repos**: `repo`
+- **Navigate repos**: `repo cd <name>` or `repo <name>`
+- **Clone external repo**: `clone <github-url>`
+
+---
+
 ## Workflow Example
 
 ```bash

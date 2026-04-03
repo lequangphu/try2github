@@ -53,16 +53,27 @@ get_rc_file() {
 check_prerequisites() {
     # Check for tobi/try
     if ! command -v try &>/dev/null; then
-        print_error "tobi/try is required but not installed."
-        echo "Install it first:"
-        echo "  gem install try-cli"
-        echo ""
-        echo "Then add to your shell RC:"
-        echo '  eval "$(try init ~/src/tries)"'
-        exit 1
+        print_warning "tobi/try is required but not installed."
+        
+        # Check if gem is available
+        if ! command -v gem &>/dev/null; then
+            print_error "Ruby gems not available. Install Ruby first:"
+            echo "  macOS: brew install ruby"
+            echo "  Ubuntu: sudo apt-get install ruby"
+            exit 1
+        fi
+        
+        # Auto-install tobi/try
+        print_status "Installing tobi/try (gem install try-cli)..."
+        if gem install try-cli; then
+            print_status "tobi/try installed successfully"
+        else
+            print_error "Failed to install tobi/try"
+            exit 1
+        fi
+    else
+        print_status "Found tobi/try"
     fi
-    
-    print_status "Found tobi/try"
 }
 
 cleanup_old_install() {
