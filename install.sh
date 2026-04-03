@@ -65,6 +65,27 @@ check_prerequisites() {
     print_status "Found tobi/try"
 }
 
+cleanup_old_install() {
+    # Remove old standalone scripts if they exist
+    local bin_dir="$HOME/.local/bin"
+    local old_scripts="$bin_dir/try $bin_dir/promote $bin_dir/repo $bin_dir/clone $bin_dir/tries"
+    local found=0
+    
+    for script in $old_scripts; do
+        if [ -f "$script" ]; then
+            found=1
+            rm -f "$script"
+            print_status "Removed old script: $script"
+        fi
+    done
+    
+    if [ $found -eq 1 ]; then
+        echo ""
+        print_warning "Old standalone scripts have been removed."
+        print_warning "Commands are now shell functions (sourced into your shell)."
+    fi
+}
+
 install_try2github() {
     print_status "Installing try2github..."
     
@@ -74,6 +95,9 @@ install_try2github() {
     
     # Check prerequisites
     check_prerequisites
+    
+    # Cleanup old install
+    cleanup_old_install
     
     # Clone or update repository
     if [ -d "$INSTALL_DIR" ]; then
