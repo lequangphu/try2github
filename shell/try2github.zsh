@@ -133,7 +133,11 @@ clone() {
         # HTTPS: https://github.com/user/repo.git
         # SSH: git@github.com:user/repo.git
         user=$(echo "$url" | sed -E 's|.*github\.com[/:]([^/]+)/.*|\1|')
-        repo=$(echo "$url" | sed -E 's|.*github\.com[/:][^/]+/([^/]+)(\.git)?$|\1|')
+        repo=$(echo "$url" | sed -E 's|.*github\.com[/:][^/]+/([^/]+)\.git.*|\1|')
+        # If no .git extension, extract without it
+        if [[ -z "$repo" ]]; then
+            repo=$(echo "$url" | sed -E 's|.*github\.com[/:][^/]+/([^/]+).*|\1|')
+        fi
     else
         echo "Error: URL must contain github.com"
         return 1
