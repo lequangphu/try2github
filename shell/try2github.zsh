@@ -112,6 +112,60 @@ compdef _repo_complete repo 2>/dev/null
 compdef _promote_complete promote 2>/dev/null
 
 # ============================================
+# clone - Clone external repos to proper location
+# Usage: clone <github-url>
+# Example: clone https://github.com/NousResearch/hermes-agent-self-evolution.git
+# Clones to ~/src/github.com/NousResearch/hermes-agent-self-evolution
+# ============================================
+clone() {
+    local url="$1"
+    
+    if [[ -z "$url" ]]; then
+        echo "Usage: clone <github-url>"
+        return 1
+    fi
+    
+    # Extract user and repo from URL
+    # Supports: https://github.com/user/repo.git or git@github.com:user/repo.git
+    local user repo
+    
+    if [[ "$url" == *"github.com"* ]]; then
+        # HTTPS: https://github.com/user/repo.git
+        # SSH: git@github.com:user/repo.git
+        user=$(echo "$url" | sed -E 's|.*github\.com[/:]([^/]+)/.*|\1|')
+        repo=$(echo "$url" | sed -E 's|.*github\.com[/:][^/]+/([^/]+)(\.git)?$|\1|')
+    else
+        echo "Error: URL must contain github.com"
+        return 1
+    fi
+    
+    if [[ -z "$user" || -z "$repo" ]]; then
+        echo "Error: Could not parse user/repo from URL"
+        echo "Usage: clone https://github.com/user/repo.git"
+        return 1
+    fi
+    
+    local target="$HOME/src/github.com/$user/$repo"
+    
+    if [[ -d "$target" ]]; then
+        echo "Directory already exists: $target"
+        echo "Use: cd $target"
+        return 1
+    fi
+    
+    echo "Cloning to: $target"
+    mkdir -p "$(dirname "$target")"
+    
+    if git clone "$url" "$target"; then
+        cd "$target"
+        echo "Cloned: $(basename "$target")"
+    else
+        echo "Clone failed"
+        return 1
+    fi
+}
+
+# ============================================
 # Aliases
 # ============================================
 alias tr='try'

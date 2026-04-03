@@ -73,6 +73,25 @@ repo path               # Print repos directory path
 repo my-project         # Shorthand: cd to matching repo
 ```
 
+### `clone <github-url>`
+
+Clone external repos to the proper namespaced location.
+
+```bash
+# Don't do this (clutters home directory):
+git clone https://github.com/NousResearch/hermes-agent-self-evolution.git
+
+# Do this instead:
+clone https://github.com/NousResearch/hermes-agent-self-evolution.git
+# Clones to ~/src/github.com/NousResearch/hermes-agent-self-evolution
+```
+
+Works with both HTTPS and SSH URLs:
+```bash
+clone https://github.com/user/repo.git
+clone git@github.com:user/repo.git
+```
+
 ## Installation
 
 ### One-liner (Recommended)
